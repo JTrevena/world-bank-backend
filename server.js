@@ -2,11 +2,17 @@ import { Application } from "https://deno.land/x/abc/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 
 const app = new Application();
-const PORT = 8080;
+const PORT = 8080; // single source of truth
 
 const CorsSettings = {
   origin: /^.+localhost:(3000|1234)$/,
-  allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  allowedHeaders: [
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "Origin",
+    "User-Agent",
+  ],
   credentials: true,
 };
 
