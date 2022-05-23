@@ -1,5 +1,10 @@
 import { Application } from "https://deno.land/x/abc/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
+import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
+import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+
+const client = new Client("postgres://rlihxtrg:PmCvI1D4fiW4F0zD6Ik11j5ZxEM7XKxC@surus.db.elephantsql.com/rlihxtrg");
+await client.connect();
 
 const app = new Application();
 const PORT = 8080; // single source of truth
@@ -21,7 +26,24 @@ app
 
 async function postNewUser(server) {}
 
-async function handleLogin(server) {}
+async function handleLogin(server) {
+  const { username, password } = await server.body;
+  const users = (await client.queryObject(`SELECT * FROM users`)).rows;
+
+  let user;
+  users.forEach(currentUser => {
+    if (currentUser.username === username) {
+      user = currentUser;
+    }
+  });
+
+  const userExists = user !== undefined;
+  const passwordIsValid = userExists ? await bcrypt.compare(password, user.hashed_password) : false;
+
+  if (!(userExists && passwordIsValid)) return server.json({ Error: "Username or password is incorrect" });
+
+  // User verified. TODO: Rest of function
+}
 
 async function getResults(server) {}
 
