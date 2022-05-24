@@ -11,7 +11,7 @@ const client = new Client(Deno.env.get("PG_URL"));
 await client.connect();
 
 const app = new Application();
-const PORT = Deno.env.get("PORT");
+const PORT = Number(Deno.env.get("PORT"));
 
 const CorsSettings = {
   origin: /^.+localhost:(3000|1234)$/, // TODO: Change this to include Netlify domain once hosted
