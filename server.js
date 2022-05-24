@@ -44,16 +44,7 @@ async function handleLogin(server) {
   if (!(userExists && passwordIsValid)) return server.json({ Error: "Username or password is incorrect" });
 
   // EDGE CASE: user left site and deleted their cookies
-  const sessions = (await client.queryObject(`SELECT * FROM sessions`)).rows;
-
-  let sessionToDelete;
-  sessions.forEach(currentSession => {
-    if (currentSession.user_id === user.id) {
-      sessionToDelete = currentSession;
-    }
-  });
-  if (sessionToDelete !== undefined)
-    await client.query(`DELETE * FROM sessions WHERE uuid = ?`, [sessionToDelete.uuid]);
+  await client.query(`DELETE * FROM sessions WHERE user_id = ?`, [user.id]);
 
   const sessionUUID = v4.generate();
 
