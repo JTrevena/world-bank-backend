@@ -2,15 +2,19 @@ import { Application } from "https://deno.land/x/abc/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import { config } from "https://deno.land/x/dotenv/mod.ts";
 
-const client = new Client("postgres://rlihxtrg:PmCvI1D4fiW4F0zD6Ik11j5ZxEM7XKxC@surus.db.elephantsql.com/rlihxtrg");
+const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
+config({ path: `./.env.${DENO_ENV}`, export: true });
+
+const client = new Client(Deno.env.get("PG_URL"));
 await client.connect();
 
 const app = new Application();
-const PORT = 8080; // single source of truth
+const PORT = Deno.env.get("PORT");
 
 const CorsSettings = {
-  origin: /^.+localhost:(3000|1234)$/,
+  origin: /^.+localhost:(3000|1234)$/, // TODO: Change this to include Netlify domain once hosted
   allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
