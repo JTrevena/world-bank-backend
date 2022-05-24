@@ -2,6 +2,7 @@ import { Application } from "https://deno.land/x/abc/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
@@ -61,16 +62,21 @@ async function handleLogin(server) {
 
   if (!(userExists && passwordIsValid)) return server.json({ Error: "Username or password is incorrect" });
 
-  const sessions = (await client.queryObject(`SELECT * FROM sessions`)).rows;
-
   // EDGE CASE: user left site and deleted their cookies
-  let sessionToDelete;
-  sessions.forEach(currentSession => {
-    if (currentSession.user_id === user.id) {
-      sessionToDelete = currentSession;
-    }
+  await client.query(`DELETE * FROM sessions WHERE user_id = ?`, [user.id]);
+
+  const sessionUUID = v4.generate();
+
+  await client.query(
+    `INSERT INTO sessions (uuid, user_id, created_at)
+  VALUES (?, ?, NOW())`,
+    [sessionUUID, user.id]
+  );
+
+  server.setCookie({
+    name: "sessionId",
+    value: sessionUUID,
   });
-  if (sessionToDelete !== undefined) await client.query(`DELETE * FROM sessions WHERE id = ?`, [sessionToDelete.id]);
 }
 
 async function getResults(server) {
