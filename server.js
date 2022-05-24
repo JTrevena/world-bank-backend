@@ -24,7 +24,22 @@ app
   .delete("/logout", handleLogout)
   .start({ port: PORT });
 
-async function postNewUser(server) {}
+async function postNewUser(server) {
+  const { username, password } = await server.body;
+
+  const salt = bcrypt.genSalt(8);
+  const hashed_password = bcrypt.hash(password, salt);
+
+  try {
+    await client.query(`INSERT INTO users (username, hashed_password, salt, admin_permission, created_at)
+  VALUES (?,?,?,?, NOW())`),
+      [username, hashed_password, salt, false];
+  } catch (e) {
+    return server.json({ Error: e }, 500);
+  }
+
+  server.json({ response: "User added successfully" }, 200);
+}
 
 async function handleLogin(server) {
   const { username, password } = await server.body;
@@ -42,7 +57,16 @@ async function handleLogin(server) {
 
   if (!(userExists && passwordIsValid)) return server.json({ Error: "Username or password is incorrect" });
 
-  // User verified. TODO: Rest of function
+  const sessions = (await client.queryObject(`SELECT * FROM sessions`)).rows;
+
+  // EDGE CASE: user left site and deleted their cookies
+  let sessionToDelete;
+  sessions.forEach(currentSession => {
+    if (currentSession.user_id === user.id) {
+      sessionToDelete = currentSession;
+    }
+  });
+  if (sessionToDelete !== undefined) await client.query(`DELETE * FROM sessions WHERE id = ?`, [sessionToDelete.id]);
 }
 
 async function getResults(server) {}
