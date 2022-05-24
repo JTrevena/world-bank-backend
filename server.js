@@ -24,7 +24,22 @@ app
   .delete("/logout", handleLogout)
   .start({ port: PORT });
 
-async function postNewUser(server) {}
+async function postNewUser(server) {
+  const { username, password } = await server.body;
+
+  const salt = bcrypt.genSalt(8);
+  const hashed_password = bcrypt.hash(password, salt);
+
+  try {
+    await client.query(`INSERT INTO users (username, hashed_password, salt, admin_permission, created_at)
+  VALUES (?,?,?,?, NOW())`),
+      [username, hashed_password, salt, false];
+  } catch (e) {
+    return server.json({ Error: e }, 500);
+  }
+
+  server.json({ response: "User added successfully" }, 200);
+}
 
 async function handleLogin(server) {
   const { username, password } = await server.body;
