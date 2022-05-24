@@ -42,9 +42,9 @@ async function handleLogin(server) {
 
   if (!(userExists && passwordIsValid)) return server.json({ Error: "Username or password is incorrect" });
 
+  // EDGE CASE: user left site and deleted their cookies
   const sessions = (await client.queryObject(`SELECT * FROM sessions`)).rows;
 
-  // EDGE CASE: user left site and deleted their cookies
   let sessionToDelete;
   sessions.forEach(currentSession => {
     if (currentSession.user_id === user.id) {
@@ -52,6 +52,12 @@ async function handleLogin(server) {
     }
   });
   if (sessionToDelete !== undefined) await client.query(`DELETE * FROM sessions WHERE id = ?`, [sessionToDelete.id]);
+
+  await client.query(
+    `INSERT INTO sessions (user_id, created_at)
+  VALUES (?, NOW())`,
+    [user.id]
+  );
 }
 
 async function getResults(server) {}
