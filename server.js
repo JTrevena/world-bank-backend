@@ -2,6 +2,7 @@ import { Application } from "https://deno.land/x/abc/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
 
 const client = new Client("postgres://rlihxtrg:PmCvI1D4fiW4F0zD6Ik11j5ZxEM7XKxC@surus.db.elephantsql.com/rlihxtrg");
 await client.connect();
@@ -51,13 +52,21 @@ async function handleLogin(server) {
       sessionToDelete = currentSession;
     }
   });
-  if (sessionToDelete !== undefined) await client.query(`DELETE * FROM sessions WHERE id = ?`, [sessionToDelete.id]);
+  if (sessionToDelete !== undefined)
+    await client.query(`DELETE * FROM sessions WHERE uuid = ?`, [sessionToDelete.uuid]);
+
+  const sessionUUID = v4.generate();
 
   await client.query(
-    `INSERT INTO sessions (user_id, created_at)
-  VALUES (?, NOW())`,
-    [user.id]
+    `INSERT INTO sessions (uuid, user_id, created_at)
+  VALUES (?, ?, NOW())`,
+    [sessionUUID, user.id]
   );
+
+  server.setCookie({
+    name: "sessionId",
+    value: sessionUUID,
+  });
 }
 
 async function getResults(server) {}
