@@ -69,7 +69,10 @@ async function handleLogin(server) {
   if (sessionToDelete !== undefined) await client.query(`DELETE * FROM sessions WHERE id = ?`, [sessionToDelete.id]);
 }
 
-async function getResults(server) {}
+async function getResults(server) {
+  //server test
+  return server.json({ response: "The server is running" }, 200);
+}
 
 async function getHistory(server) {}
 
