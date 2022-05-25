@@ -37,7 +37,7 @@ async function postNewUser(server) {
 
   try {
     await client.query(`INSERT INTO users (username, hashed_password, salt, admin_permission, created_at)
-  VALUES (?,?,?,?, NOW())`),
+  VALUES (?,?,?,?, NOW());`),
       [username, hashed_password, salt, false];
   } catch (e) {
     return server.json({ error: e }, 500);
@@ -48,7 +48,7 @@ async function postNewUser(server) {
 
 async function handleLogin(server) {
   const { username, password } = await server.body;
-  const users = (await client.queryObject(`SELECT * FROM users`)).rows;
+  const users = (await client.queryObject(`SELECT * FROM users;`)).rows;
 
   let user;
   users.forEach(currentUser => {
@@ -63,13 +63,13 @@ async function handleLogin(server) {
   if (!(userExists && passwordIsValid)) return server.json({ Error: "Username or password is incorrect" });
 
   // EDGE CASE: user left site and deleted their cookies
-  await client.query(`DELETE * FROM sessions WHERE user_id = ?`, [user.id]);
+  await client.query(`DELETE * FROM sessions WHERE user_id = ?;`, [user.id]);
 
   const sessionUUID = v4.generate();
 
   await client.query(
     `INSERT INTO sessions (uuid, user_id, created_at)
-  VALUES (?, ?, NOW())`,
+  VALUES (?, ?, NOW());`,
     [sessionUUID, user.id]
   );
 
@@ -112,7 +112,7 @@ async function handleLogout(server) {
     //Error("No session cookie exists")
   }
 
-  if (sessionID !== undefined) await client.query(`DELETE FROM sessions WHERE uuid = ?`, [sessionID]);
+  if (sessionID !== undefined) await client.query(`DELETE FROM sessions WHERE uuid = ?;`, [sessionID]);
 
   //Delete user cookies from browser
   server.setCookie({
@@ -128,7 +128,7 @@ async function handleLogout(server) {
 }
 
 async function getUserInfo(username) {
-  const user = (await client.queryObject(`SELECT * FROM users WHERE username = ?`, [username])).rows;
+  const user = (await client.queryObject(`SELECT * FROM users WHERE username = ?;`, [username])).rows;
   return user;
 }
 
