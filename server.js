@@ -95,7 +95,7 @@ async function getHistory(server) {
   const user = getUserInfo(username);
 
   let query = `SELECT * FROM search_history`;
-  if (!user.admin_permission) query += `WHERE user_id = ${user.id}`;
+  if (!user.admin_permission) query += ` WHERE user_id = ${user.id};`;
 
   const searches = (await client.queryObject(query)).rows;
 
