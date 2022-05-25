@@ -97,7 +97,17 @@ async function handleLogout(server) {
 
   await client.query(`DELETE FROM sessions WHERE uuid = ?`, [sessionID]);
 
-  // TODO: Delete user cookies from browser - perhaps frontend?
+  //Delete user cookies from browser
+  server.setCookie({
+    name: "sessionID",
+    value: "",
+    expires: "Thu, Jan 01 1970 00:00:00 UTC",
+  });
+  server.setCookie({
+    name: "username",
+    value: "",
+    expires: "Thu, Jan 01 1970 00:00:00 UTC",
+  });
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
