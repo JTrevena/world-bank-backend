@@ -32,7 +32,7 @@ app
 async function postNewUser(server) {
   const { username, password } = await server.body;
 
-  const salt = await bcrypt.genSalt(8);
+  const salt = bcrypt.genSalt(8);
   const hashed_password = await bcrypt.hash(password, salt);
 
   try {
