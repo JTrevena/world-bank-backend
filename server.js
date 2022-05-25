@@ -37,7 +37,7 @@ async function postNewUser(server) {
 
   try {
     await client.queryObject(`INSERT INTO users (username, hashed_password, salt, admin_permission, created_at)
-  VALUES (?,?,?,?, NOW());`),
+  VALUES (?,?,?,?, NOW())`),
       [username, hashed_password, salt, false];
   } catch (e) {
     return server.json({ error: e }, 500);
