@@ -40,7 +40,7 @@ async function postNewUser(server) {
   VALUES (?,?,?,?, NOW())`),
       [username, hashed_password, salt, false];
   } catch (e) {
-    return server.json({ Error: e }, 500);
+    return server.json({ error: e }, 500);
   }
 
   server.json({ response: "User added successfully" }, 200);
@@ -74,7 +74,7 @@ async function handleLogin(server) {
   );
 
   server.setCookie({
-    name: "sessionId",
+    name: "sessionID",
     value: sessionUUID,
   });
   server.setCookie({
