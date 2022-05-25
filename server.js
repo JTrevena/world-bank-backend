@@ -92,7 +92,7 @@ async function getResults(server) {
 async function getHistory(server) {
   const cookies = await server.cookies;
   const username = cookies.username;
-  console.log(username);
+  return server.json({ username: username });
   const user = getUserInfo(username);
 
   let query = `SELECT * FROM search_history`;
