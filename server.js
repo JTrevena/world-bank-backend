@@ -32,8 +32,8 @@ app
 async function postNewUser(server) {
   const { username, password } = await server.body;
 
-  const salt = bcrypt.genSalt(8);
-  const hashed_password = bcrypt.hash(password, salt);
+  const salt = await bcrypt.genSalt(8);
+  const hashed_password = await bcrypt.hash(password, salt);
 
   try {
     await client.query(`INSERT INTO users (username, hashed_password, salt, admin_permission, created_at)
