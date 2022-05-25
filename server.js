@@ -15,8 +15,17 @@ const app = new Application();
 const PORT = Number(Deno.env.get("PORT"));
 
 const CorsSettings = {
-  origin: [/^.+localhost:(3000|1234)$/, "https://world-bank-dashboard.netlify.app/"],
-  allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  origin: [
+    /^.+localhost:(3000|1234)$/,
+    "https://world-bank-dashboard.netlify.app/",
+  ],
+  allowedHeaders: [
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "Origin",
+    "User-Agent",
+  ],
   credentials: true,
 };
 
@@ -44,7 +53,7 @@ async function postNewUser(server) {
       false
     );
   } catch (e) {
-    return server.json({ error: e }, 500);
+    return server.json({ error: "could not add user to database" }, 500);
   }
 
   server.json({ response: "User added successfully" }, 200);
@@ -55,26 +64,29 @@ async function handleLogin(server) {
   const users = (await client.queryObject(`SELECT * FROM users;`)).rows;
 
   let user;
-  users.forEach(currentUser => {
+  users.forEach((currentUser) => {
     if (currentUser.username === username) {
       user = currentUser;
     }
   });
 
   const userExists = user !== undefined;
-  const passwordIsValid = userExists ? await bcrypt.compare(password, user.hashed_password) : false;
+  const passwordIsValid = userExists
+    ? await bcrypt.compare(password, user.hashed_password)
+    : false;
 
-  if (!(userExists && passwordIsValid)) return server.json({ Error: "Username or password is incorrect" });
+  if (!(userExists && passwordIsValid))
+    return server.json({ error: "Username or password is incorrect" });
 
   // EDGE CASE: user left site and deleted their cookies
-  await client.query(`DELETE * FROM sessions WHERE user_id = ?;`, [user.id]);
+  await client.queryObject("DELETE FROM sessions WHERE user_id = $1;", user.id);
 
   const sessionUUID = v4.generate();
 
-  await client.query(
-    `INSERT INTO sessions (uuid, user_id, created_at)
-  VALUES (?, ?, NOW());`,
-    [sessionUUID, user.id]
+  await client.queryObject(
+    "INSERT INTO sessions (uuid, user_id, created_at) VALUES ($1, $2, NOW());",
+    sessionUUID,
+    user.id
   );
 
   server.setCookie({
@@ -90,7 +102,10 @@ async function handleLogin(server) {
 async function getResults(server) {
   //server test
   const cookie = await server.cookies;
-  return server.json({ response: "The server is running", cookieResponse: cookie }, 200);
+  return server.json(
+    { response: "The server is running", cookieResponse: cookie },
+    200
+  );
 }
 
 async function getHistory(server) {
@@ -117,23 +132,26 @@ async function handleLogout(server) {
     //Error("No session cookie exists")
   }
 
-  if (sessionID !== undefined) await client.query(`DELETE FROM sessions WHERE uuid = ?;`, [sessionID]);
-
-  //Delete user cookies from browser
-  server.setCookie({
-    name: "sessionID",
-    value: "",
-    expires: "Thu, Jan 01 1970 00:00:00 UTC",
-  });
-  server.setCookie({
-    name: "username",
-    value: "",
-    expires: "Thu, Jan 01 1970 00:00:00 UTC",
-  });
+  if (sessionID !== undefined)
+    try {
+      await client.queryObject(
+        "DELETE FROM sessions WHERE uuid = $1;",
+        sessionID
+      );
+      // if above code fails does it go straight to catch or does below code run?
+      return server.json({ response: "session ended" });
+    } catch (e) {
+      return server.json({ error: "could not remove session" });
+    } // spent about an hour and couldn't delete/overwrite cookies so I propose to delete in frontend (if we get response from backend)
 }
 
 async function getUserInfo(username) {
-  const user = (await client.queryObject(`SELECT * FROM users WHERE username = ?;`, [username])).rows;
+  const user = (
+    await client.queryObject(
+      "SELECT * FROM users WHERE username = $1;",
+      username
+    )
+  ).rows;
   return user;
 }
 
