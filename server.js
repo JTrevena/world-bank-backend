@@ -15,7 +15,7 @@ const app = new Application();
 const PORT = Number(Deno.env.get("PORT"));
 
 const CorsSettings = {
-  origin: "*", // TODO: Change this to include Netlify domain once hosted
+  origin: [/^.+localhost:(3000|1234)$/, "https://world-bank-dashboard.netlify.app/"],
   allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
@@ -109,5 +109,7 @@ async function handleLogout(server) {
     expires: "Thu, Jan 01 1970 00:00:00 UTC",
   });
 }
+
+async function getUserInfo(username) {}
 
 console.log(`Server running on http://localhost:${PORT}`);
