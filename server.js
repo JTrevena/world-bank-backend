@@ -77,6 +77,10 @@ async function handleLogin(server) {
     name: "sessionId",
     value: sessionUUID,
   });
+  server.setCookie({
+    name: "username",
+    value: username,
+  });
 }
 
 async function getResults(server) {
