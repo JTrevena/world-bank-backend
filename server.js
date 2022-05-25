@@ -36,8 +36,9 @@ async function postNewUser(server) {
   const hashed_password = await bcrypt.hash(password, salt);
 
   try {
-    await client.queryObject(`INSERT INTO users (username, hashed_password, salt, admin_permission, created_at)
-  VALUES (?,?,?,?, NOW())`),
+    await client.queryObject(
+      "INSERT INTO users (username, hashed_password, salt, admin_permission, created_at) VALUES (?,?,?,?, NOW())"
+    ),
       [username, hashed_password, salt, false];
   } catch (e) {
     return server.json({ error: e }, 500);
