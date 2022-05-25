@@ -15,7 +15,7 @@ const app = new Application();
 const PORT = Number(Deno.env.get("PORT"));
 
 const CorsSettings = {
-  origin: /^.+localhost:(3000|1234)$/, // TODO: Change this to include Netlify domain once hosted
+  origin: "*", // TODO: Change this to include Netlify domain once hosted
   allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
