@@ -85,7 +85,8 @@ async function handleLogin(server) {
 
 async function getResults(server) {
   //server test
-  return server.json({ response: "The server is running" }, 200);
+  const cookie = await server.cookies.get();
+  return server.json({ response: "The server is running", cookieResponse: cookie }, 200);
 }
 
 async function getHistory(server) {}
