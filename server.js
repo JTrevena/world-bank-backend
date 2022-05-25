@@ -93,9 +93,14 @@ async function getHistory(server) {}
 
 async function handleLogout(server) {
   const cookies = await server.cookies;
-  const sessionID = cookies.sessionID;
+  let sessionID;
+  try {
+    sessionID = cookies.sessionID;
+  } catch (e) {
+    //Error("No session cookie exists")
+  }
 
-  await client.query(`DELETE FROM sessions WHERE uuid = ?`, [sessionID]);
+  if (sessionID !== undefined) await client.query(`DELETE FROM sessions WHERE uuid = ?`, [sessionID]);
 
   //Delete user cookies from browser
   server.setCookie({
