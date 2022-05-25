@@ -89,7 +89,19 @@ async function getResults(server) {
   return server.json({ response: "The server is running", cookieResponse: cookie }, 200);
 }
 
-async function getHistory(server) {}
+async function getHistory(server) {
+  const cookies = await server.cookies;
+  const username = cookies.username;
+  const user = getUserInfo(username);
+
+  const query = `SELECT * FROM search_history`;
+  if (!user.admin_permission) query += `WHERE user_id = ${user.id}`;
+
+  const searches = (await client.queryObject(query)).rows;
+
+  if (searches) server.json(searches);
+  else server.json({ response: "no searches found" });
+}
 
 async function handleLogout(server) {
   const cookies = await server.cookies;
@@ -115,6 +127,9 @@ async function handleLogout(server) {
   });
 }
 
-async function getUserInfo(username) {}
+async function getUserInfo(username) {
+  const user = (await client.queryObject(`SELECT * FROM users WHERE username = ?`, [username])).rows;
+  return user;
+}
 
 console.log(`Server running on http://localhost:${PORT}`);
