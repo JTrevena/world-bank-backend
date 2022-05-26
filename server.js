@@ -34,7 +34,6 @@ const CorsSettings = {
 
 app
   .use(abcCors(CorsSettings))
-  .set("trust proxy", 1)
   .post("/create-user", postNewUser)
   .post("/login", handleLogin)
   .get("/results", getResults)
