@@ -89,20 +89,14 @@ async function handleLogin(server) {
     user.id
   );
 
-  server.setCookie(
-    {},
-    {
-      name: "sessionID",
-      value: sessionUUID,
-    }
-  );
-  server.setCookie(
-    {},
-    {
-      name: "username",
-      value: username,
-    }
-  );
+  server.setCookie({
+    name: "sessionID",
+    value: sessionUUID,
+  });
+  server.setCookie({
+    name: "username",
+    value: username,
+  });
 }
 
 async function getResults(server) {
