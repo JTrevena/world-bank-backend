@@ -140,18 +140,18 @@ async function getHistory(server) {
   const username = cookies.username; //username is read properly
   const user = await getUserInfo(server, username); // but user is not found correctly
 
-  return server.json({ username: username, user: user });
+  // return server.json({ username: username, user: user });
 
-  let query = `SELECT * FROM search_history`;
-  let searches;
+  // let query = `SELECT * FROM search_history`;
+  // let searches;
 
-  if (!user.admin_permission) {
-    query += ` WHERE user_id = $1;`;
-    searches = (await client.queryObject(query, user.id)).rows;
-  } else searches = (await client.queryObject(query)).rows;
+  // if (!user.admin_permission) {
+  //   query += ` WHERE user_id = $1;`;
+  //   searches = (await client.queryObject(query, user.id)).rows;
+  // } else searches = (await client.queryObject(query)).rows;
 
-  if (searches) server.json({ response: searches });
-  else server.json({ response: "no searches found" });
+  // if (searches) server.json({ response: searches });
+  // else server.json({ response: "no searches found" });
 }
 
 async function handleLogout(server) {
@@ -176,7 +176,7 @@ async function handleLogout(server) {
 async function getUserInfo(server, username) {
   const userNameStr = String(username);
   const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", userNameStr)).rows;
-  return server.json({ username: username, user: user });
+  server.json({ username: username, user: user });
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
