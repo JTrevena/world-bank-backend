@@ -99,7 +99,7 @@ async function getResults(server) {
 
   const cookies = await server.cookies;
   const sessionID = cookies.sessionID;
-  const user = await getUserInfo(sessionID);
+  const user = await getUserInfo(server, sessionID);
 
   //record search
   await client.queryObject(
@@ -144,7 +144,7 @@ async function getResults(server) {
 async function getHistory(server) {
   const cookies = await server.cookies;
   const sessionID = cookies.sessionID;
-  const user = await getUserInfo(sessionID);
+  const user = await getUserInfo(server, sessionID);
 
   let query = `SELECT * FROM search_history`;
   let searches;
@@ -177,7 +177,7 @@ async function handleLogout(server) {
     } // spent about an hour and couldn't delete/overwrite cookies so I propose to delete in frontend (if we get response from backend)
 }
 
-async function getUserInfo(sessionID) {
+async function getUserInfo(server, sessionID) {
   const session = (await client.queryObject("SELECT * FROM sessions WHERE uuid = $1;", sessionID)).rows;
   return server.json({ session: session });
   const user_id = session[0].user_id;
