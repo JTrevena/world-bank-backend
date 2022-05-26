@@ -101,10 +101,13 @@ async function handleLogin(server) {
 
 async function getResults(server) {
   const { country, indicator, startYear, endYear } = server.queryParams;
-  if (country == undefined) return server.json({ error: "country must be specified" });
+  if (country === undefined) return server.json({ error: "country must be specified" });
 
   let query = `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`;
-  const results = (await worldBankDB.queryObject(query, country)).rows;
+
+  if (indicator !== undefined) query += ` AND IndicatorName = $2`;
+
+  const results = (await worldBankDB.queryObject(query, country, indicator)).rows;
   await server.json({ response: results });
 }
 
