@@ -94,12 +94,11 @@ async function handleLogin(server) {
 }
 
 async function getResults(server) {
-  const { country, indicator, startYear, endYear } = server.queryParams;
+  const { country, indicator, startYear, endYear, sessionID } = server.queryParams;
   if (country === undefined) return server.json({ error: "country must be specified" });
 
   // const cookies = await server.cookies;
   // const sessionID = cookies.sessionID;
-  const { sessionID } = await server.body;
   const user = await getUserInfo(server, sessionID);
 
   //record search
@@ -143,10 +142,10 @@ async function getResults(server) {
 }
 
 async function getHistory(server) {
-  // const cookies = await server.cookies;
-  // const sessionID = cookies.sessionID;
+  const cookies = await server.cookies;
+  const sessionID = cookies.sessionID;
 
-  const { sessionID } = await server.body;
+  // const { sessionID } = await server.body;
   const user = await getUserInfo(server, sessionID);
 
   let query = `SELECT * FROM search_history`;
