@@ -146,6 +146,8 @@ async function getHistory(server) {
   const sessionID = cookies.sessionID;
   const user = await getUserInfo(server, sessionID);
 
+  return server.json({ user: user });
+
   let query = `SELECT * FROM search_history`;
   let searches;
 
