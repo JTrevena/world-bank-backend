@@ -139,7 +139,7 @@ async function getHistory(server) {
   const cookies = await server.cookies;
   const username = cookies.username;
   const user = getUserInfo(username);
-  return server.json(user); // TEST
+  return server.json({ user: user }); // TEST
 
   let query = `SELECT * FROM search_history`;
   let searches;
