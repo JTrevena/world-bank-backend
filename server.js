@@ -76,7 +76,7 @@ async function handleLogin(server) {
     : false;
 
   if (!(userExists && passwordIsValid))
-    return server.json({ error: "Username or password is incorrect" });
+    return server.json({ error: "Username or password is incorrect" }, 400);
 
   // EDGE CASE: user left site and deleted their cookies
   await client.queryObject("DELETE FROM sessions WHERE user_id = $1;", user.id);
