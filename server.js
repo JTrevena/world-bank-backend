@@ -174,7 +174,7 @@ async function handleLogout(server) {
 async function getUserInfo(username) {
   const userNameStr = String(username);
   const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", userNameStr)).rows;
-  return user;
+  return await user;
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
