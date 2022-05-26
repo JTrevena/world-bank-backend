@@ -17,15 +17,13 @@ const PORT = Number(Deno.env.get("PORT"));
 const CorsSettings = {
   origin: [
     /^.+localhost:(3000|1234)$/,
+    "https://world-bank-dashboard.netlify.app",
     "https://world-bank-dashboard.netlify.app/",
+    "https://world-bank-dashboard.netlify.app/login",
+    "https://world-bank-dashboard.netlify.app/sign-up",
+    "https://world-bank-dashboard.netlify.app/history",
   ],
-  allowedHeaders: [
-    "Authorization",
-    "Content-Type",
-    "Accept",
-    "Origin",
-    "User-Agent",
-  ],
+  allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
 
@@ -64,19 +62,16 @@ async function handleLogin(server) {
   const users = (await client.queryObject(`SELECT * FROM users;`)).rows;
 
   let user;
-  users.forEach((currentUser) => {
+  users.forEach(currentUser => {
     if (currentUser.username === username) {
       user = currentUser;
     }
   });
 
   const userExists = user !== undefined;
-  const passwordIsValid = userExists
-    ? await bcrypt.compare(password, user.hashed_password)
-    : false;
+  const passwordIsValid = userExists ? await bcrypt.compare(password, user.hashed_password) : false;
 
-  if (!(userExists && passwordIsValid))
-    return server.json({ error: "Username or password is incorrect" }, 400);
+  if (!(userExists && passwordIsValid)) return server.json({ error: "Username or password is incorrect" }, 400);
 
   // EDGE CASE: user left site and deleted their cookies
   await client.queryObject("DELETE FROM sessions WHERE user_id = $1;", user.id);
@@ -102,10 +97,7 @@ async function handleLogin(server) {
 async function getResults(server) {
   //server test
   const cookie = await server.cookies;
-  return server.json(
-    { response: "The server is running", cookieResponse: cookie },
-    200
-  );
+  return server.json({ response: "The server is running", cookieResponse: cookie }, 200);
 }
 
 async function getHistory(server) {
@@ -134,10 +126,7 @@ async function handleLogout(server) {
 
   if (sessionID !== undefined)
     try {
-      await client.queryObject(
-        "DELETE FROM sessions WHERE uuid = $1;",
-        sessionID
-      );
+      await client.queryObject("DELETE FROM sessions WHERE uuid = $1;", sessionID);
       // if above code fails does it go straight to catch or does below code run?
       return server.json({ response: "session ended" });
     } catch (e) {
@@ -146,12 +135,7 @@ async function handleLogout(server) {
 }
 
 async function getUserInfo(username) {
-  const user = (
-    await client.queryObject(
-      "SELECT * FROM users WHERE username = $1;",
-      username
-    )
-  ).rows;
+  const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", username)).rows;
   return user;
 }
 
