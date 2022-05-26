@@ -161,13 +161,7 @@ async function getHistory(server) {
 }
 
 async function handleLogout(server) {
-  const cookies = await server.cookies;
-  let sessionID;
-  try {
-    sessionID = cookies.sessionID;
-  } catch (e) {
-    //Error("No session cookie exists")
-  }
+  const { sessionID } = await server.body;
 
   if (sessionID !== undefined)
     try {
