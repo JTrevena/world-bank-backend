@@ -138,7 +138,7 @@ async function getResults(server) {
 async function getHistory(server) {
   const cookies = await server.cookies;
   const username = cookies.username; //username is read properly
-  const user = await getUserInfo(username); // but user is not found correctly
+  const user = await getUserInfo(server, username); // but user is not found correctly
 
   return server.json({ username: username, user: user });
 
