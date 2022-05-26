@@ -148,7 +148,7 @@ async function getHistory(server) {
     searches = (await client.queryObject(query, user.id)).rows;
   } else searches = (await client.queryObject(query)).rows;
 
-  if (searches) server.json({ rseponse: searches });
+  if (searches) server.json({ response: searches });
   else server.json({ response: "no searches found" });
 }
 
