@@ -138,18 +138,18 @@ async function getResults(server) {
 async function getHistory(server) {
   const cookies = await server.cookies;
   const username = cookies.username; //username is read properly
-  const user = await getUserInfo(username); // but user is not found correctly
+  const user = await getUserInfo(server, username); // but user is not found correctly
 
-  let query = `SELECT * FROM search_history`;
-  let searches;
+  // let query = `SELECT * FROM search_history`;
+  // let searches;
 
-  if (!user.admin_permission) {
-    query += ` WHERE user_id = $1;`;
-    searches = (await client.queryObject(query, user.id)).rows;
-  } else searches = (await client.queryObject(query)).rows;
+  // if (!user.admin_permission) {
+  //   query += ` WHERE user_id = $1;`;
+  //   searches = (await client.queryObject(query, user.id)).rows;
+  // } else searches = (await client.queryObject(query)).rows;
 
-  if (searches) server.json({ response: searches });
-  else server.json({ response: "no searches found" });
+  // if (searches) server.json({ response: searches });
+  // else server.json({ response: "no searches found" });
 }
 
 async function handleLogout(server) {
@@ -171,10 +171,10 @@ async function handleLogout(server) {
     } // spent about an hour and couldn't delete/overwrite cookies so I propose to delete in frontend (if we get response from backend)
 }
 
-async function getUserInfo(username) {
+async function getUserInfo(server, username) {
   const userNameStr = String(username);
   const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", userNameStr)).rows;
-  return await user;
+  server.json({ username: username, user: user });
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
