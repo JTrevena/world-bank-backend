@@ -102,7 +102,10 @@ async function handleLogin(server) {
 async function getResults(server) {
   const { country, indicator, startYear, endYear } = server.queryParams;
   if (country == undefined) return server.json({ error: "country must be specified" });
-  const results = await worldBankDB.queryObject(`SELECT * FROM indicators WHERE CountryName = $1`, country);
+  const results = await worldBankDB.queryObject(
+    `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`,
+    country
+  );
   await server.json({ response: results });
 }
 
