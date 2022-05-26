@@ -142,10 +142,7 @@ async function getResults(server) {
 }
 
 async function getHistory(server) {
-  const cookies = await server.cookies;
-  const sessionID = cookies.sessionID;
-
-  // const { sessionID } = await server.body;
+  const { sessionID } = server.queryParams;
   const user = await getUserInfo(server, sessionID);
 
   let query = `SELECT * FROM search_history`;
@@ -161,7 +158,7 @@ async function getHistory(server) {
 }
 
 async function handleLogout(server) {
-  const { sessionID } = await server.body;
+  const { sessionID } = server.queryParams;
 
   if (sessionID !== undefined)
     try {
