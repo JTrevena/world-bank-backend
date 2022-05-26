@@ -140,7 +140,7 @@ async function getHistory(server) {
   const username = cookies.username; //username is read properly
   const user = await getUserInfo(server, username); // but user is not found correctly
 
-  // return server.json({ username: username, user: user });
+  return server.json({ username: username, user: user });
 
   // let query = `SELECT * FROM search_history`;
   // let searches;
@@ -176,7 +176,7 @@ async function handleLogout(server) {
 async function getUserInfo(server, username) {
   const userNameStr = String(username);
   const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", userNameStr)).rows;
-  server.json({ user: user[0] });
+  return { user: user[0] };
 }
 
 console.log(`Server running on http://localhost:${PORT}`);
