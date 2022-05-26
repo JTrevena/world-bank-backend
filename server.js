@@ -105,13 +105,16 @@ async function getResults(server) {
 
   let query = `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`;
   let params = [country];
+  let results;
 
   if (indicator !== undefined) {
     query += ` AND IndicatorName = $2`;
     params.push(indicator);
+    results = (await worldBankDB.queryObject(query, params[0], params[1])).rows;
   }
 
-  const results = (await worldBankDB.queryObject(query, params)).rows;
+  if (results === undefined) results = (await worldBankDB.queryObject(query, params[0])).rows;
+
   await server.json({ response: results });
 }
 
