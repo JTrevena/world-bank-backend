@@ -104,7 +104,7 @@ async function getResults(server) {
   if (country == undefined) return server.json({ error: "country must be specified" });
 
   let query = `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`;
-  const results = (await worldBankDB.queryObject(query, country)).rows();
+  const results = (await worldBankDB.queryObject(query, country)).rows;
   await server.json({ response: results });
 }
 
