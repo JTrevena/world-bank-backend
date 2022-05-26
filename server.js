@@ -89,14 +89,8 @@ async function handleLogin(server) {
     user.id
   );
 
-  server.setCookie({
-    name: "sessionID",
-    value: sessionUUID,
-  });
-  server.setCookie({
-    name: "username",
-    value: username,
-  });
+  //Cookies must be set from frontend because of netlify
+  return server.json({ response: sessionUUID });
 }
 
 async function getResults(server) {
@@ -104,8 +98,8 @@ async function getResults(server) {
   if (country === undefined) return server.json({ error: "country must be specified" });
 
   const cookies = await server.cookies;
-  const username = cookies.username;
-  const user = await getUserInfo(username);
+  const sessionID = cookies.sessionID;
+  const user = await getUserInfo(sessionID);
 
   //record search
   await client.queryObject(
@@ -149,8 +143,8 @@ async function getResults(server) {
 
 async function getHistory(server) {
   const cookies = await server.cookies;
-  const username = cookies.username;
-  const user = await getUserInfo(username);
+  const sessionID = cookies.sessionID;
+  const user = await getUserInfo(sessionID);
 
   let query = `SELECT * FROM search_history`;
   let searches;
@@ -183,9 +177,10 @@ async function handleLogout(server) {
     } // spent about an hour and couldn't delete/overwrite cookies so I propose to delete in frontend (if we get response from backend)
 }
 
-async function getUserInfo(username) {
-  const userNameStr = String(username);
-  const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", userNameStr)).rows;
+async function getUserInfo(sessionID) {
+  const session = (await client.queryObject("SELECT * FROM sessions WHERE uuid = $1;", session)).rows;
+  const user_id = session[0].user_id;
+  const user = (await client.queryObject("SELECT * FROM users WHERE id = $1;", user_id)).rows;
   return { user: user[0] };
 }
 
