@@ -39,7 +39,20 @@ app
   .get("/results", getResults)
   .get("/history", getHistory)
   .delete("/logout", handleLogout)
+  .post("/verify-session", verifySession)
   .start({ port: PORT });
+
+async function verifySession(server) {
+  const { sessionID } = server.queryParams;
+  const sessions = (await client.queryObject("SELECT * FROM sessions")).rows;
+
+  let isValid = false;
+  sessions.forEach(session => {
+    if (session.uuid === sessionID) isValid = true;
+  });
+
+  return server.json({ response: isValid });
+}
 
 async function postNewUser(server) {
   const { username, password } = await server.body;
