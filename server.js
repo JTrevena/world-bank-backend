@@ -109,7 +109,7 @@ async function getResults(server) {
   let furtherInterpolations = [`$2`, `$3`, `$4`];
   let results;
 
-  if (!startYear) startYear = 2022;
+  if (!startYear) startYear = 2021;
 
   if (indicator !== undefined) {
     query += ` AND IndicatorName = ` + furtherInterpolations.shift();
