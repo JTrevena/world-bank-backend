@@ -5,7 +5,8 @@ import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 
-const WORLD_BANK_PATH = "postgres://czreijar:TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t@kandula.db.elephantsql.com/czreijar";
+const WORLD_BANK_PATH =
+  "postgres://czreijar:TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t@kandula.db.elephantsql.com/czreijar";
 
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 config({ path: `./.env.${DENO_ENV}`, export: true });
@@ -28,7 +29,13 @@ const CorsSettings = {
     "https://world-bank-dashboard.netlify.app/sign-up",
     "https://world-bank-dashboard.netlify.app/history",
   ],
-  allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  allowedHeaders: [
+    "Authorization",
+    "Content-Type",
+    "Accept",
+    "Origin",
+    "User-Agent",
+  ],
   credentials: true,
 };
 
@@ -47,7 +54,7 @@ async function verifySession(server) {
   const sessions = (await client.queryObject("SELECT * FROM sessions")).rows;
 
   let isValid = false;
-  sessions.forEach(session => {
+  sessions.forEach((session) => {
     if (session.uuid === sessionID) isValid = true;
   });
 
@@ -80,16 +87,19 @@ async function handleLogin(server) {
   const users = (await client.queryObject(`SELECT * FROM users;`)).rows;
 
   let user;
-  users.forEach(currentUser => {
+  users.forEach((currentUser) => {
     if (currentUser.username === username) {
       user = currentUser;
     }
   });
 
   const userExists = user !== undefined;
-  const passwordIsValid = userExists ? await bcrypt.compare(password, user.hashed_password) : false;
+  const passwordIsValid = userExists
+    ? await bcrypt.compare(password, user.hashed_password)
+    : false;
 
-  if (!(userExists && passwordIsValid)) return server.json({ error: "Username or password is incorrect" }, 400);
+  if (!(userExists && passwordIsValid))
+    return server.json({ error: "Username or password is incorrect" }, 400);
 
   // EDGE CASE: user left site and deleted their cookies
   await client.queryObject("DELETE FROM sessions WHERE user_id = $1;", user.id);
@@ -102,13 +112,21 @@ async function handleLogin(server) {
     user.id
   );
 
-  //Cookies must be set from frontend because of netlify
-  return server.json({ response: sessionUUID });
+  server.setCookie({
+    name: "sessionID",
+    value: sessionUUID,
+  });
+  server.setCookie({
+    name: "username",
+    value: username,
+  });
 }
 
 async function getResults(server) {
-  const { country, indicator, startYear, endYear, sessionID } = server.queryParams;
-  if (country === undefined) return server.json({ error: "country must be specified" });
+  const { country, indicator, endYear } = server.queryParams;
+  let { startYear } = server.queryParams;
+  if (country === undefined)
+    return server.json({ error: "country must be specified" });
 
   // const cookies = await server.cookies;
   // const sessionID = cookies.sessionID;
@@ -139,17 +157,34 @@ async function getResults(server) {
     query += ` AND Year = ` + furtherInterpolations.shift();
     params.push(startYear);
   } else if (startYear && endYear) {
-    query += ` AND Year BETWEEN ` + furtherInterpolations.shift() + ` AND ` + furtherInterpolations.shift();
+    query +=
+      ` AND Year BETWEEN ` +
+      furtherInterpolations.shift() +
+      ` AND ` +
+      furtherInterpolations.shift();
     params.push(startYear);
     params.push(endYear);
   }
 
   // Forgive me for this repetitive code, Ibrahim
   if (params.length === 4)
-    results = (await worldBankDB.queryObject(query, params[0], params[1], params[2], params[3])).rows;
-  if (params.length === 3) results = (await worldBankDB.queryObject(query, params[0], params[1], params[2])).rows;
-  if (params.length === 2) results = (await worldBankDB.queryObject(query, params[0], params[1])).rows;
-  if (results === undefined) results = (await worldBankDB.queryObject(query, params[0])).rows;
+    results = (
+      await worldBankDB.queryObject(
+        query,
+        params[0],
+        params[1],
+        params[2],
+        params[3]
+      )
+    ).rows;
+  if (params.length === 3)
+    results = (
+      await worldBankDB.queryObject(query, params[0], params[1], params[2])
+    ).rows;
+  if (params.length === 2)
+    results = (await worldBankDB.queryObject(query, params[0], params[1])).rows;
+  if (results === undefined)
+    results = (await worldBankDB.queryObject(query, params[0])).rows;
 
   await server.json(results);
 }
@@ -175,7 +210,10 @@ async function handleLogout(server) {
 
   if (sessionID !== undefined)
     try {
-      await client.queryObject("DELETE FROM sessions WHERE uuid = $1;", sessionID);
+      await client.queryObject(
+        "DELETE FROM sessions WHERE uuid = $1;",
+        sessionID
+      );
       // if above code fails does it go straight to catch or does below code run?
       return server.json({ response: "session ended" });
     } catch (e) {
@@ -183,12 +221,14 @@ async function handleLogout(server) {
     } // spent about an hour and couldn't delete/overwrite cookies so I propose to delete in frontend (if we get response from backend)
 }
 
-async function getUserInfo(server, sessionID) {
-  const session = (await client.queryObject("SELECT * FROM sessions WHERE uuid = $1;", sessionID)).rows;
-  if (!session) return {}; // TODO: this should log them out; not that this request should ever be sent without a session id
-
-  const user_id = session[0].user_id;
-  const user = (await client.queryObject("SELECT * FROM users WHERE id = $1;", user_id)).rows;
+async function getUserInfo(server, username) {
+  const userNameStr = String(username);
+  const user = (
+    await client.queryObject(
+      "SELECT * FROM users WHERE username = $1;",
+      userNameStr
+    )
+  ).rows;
   return { user: user[0] };
 }
 
