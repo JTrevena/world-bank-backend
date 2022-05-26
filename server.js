@@ -99,7 +99,6 @@ async function getResults(server) {
 
   // const cookies = await server.cookies;
   // const sessionID = cookies.sessionID;
-  return server.json({ response: sessionID });
   const user = await getUserInfo(server, sessionID);
 
   //record search
