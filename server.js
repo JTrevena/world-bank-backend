@@ -105,14 +105,28 @@ async function getResults(server) {
 
   let query = `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`;
   let params = [country];
+  let furtherInterpolations = [`$2`, `$3`, `$4`];
   let results;
 
   if (indicator !== undefined) {
-    query += ` AND IndicatorName = $2`;
+    query += ` AND IndicatorName = ` + furtherInterpolations.shift();
     params.push(indicator);
-    results = (await worldBankDB.queryObject(query, params[0], params[1])).rows;
   }
 
+  if (startYear !== undefined && endYear === undefined) {
+    query += ` AND Year = ` + furtherInterpolations.shift();
+    params.push(startYear);
+  } else if (startYear !== undefined && endYear !== undefined) {
+    query += ` AND Year BETWEEN ` + furtherInterpolations.shift() + ` AND ` + furtherInterpolations.shift();
+    params.push(startYear);
+    params.push(endYear);
+  }
+
+  // Forgive me for this repetitive code, Ibrahim
+  if (params.length === 4)
+    results = (await worldBankDB.queryObject(query, params[0], params[1], params[2], params[3])).rows;
+  if (params.length === 3) results = (await worldBankDB.queryObject(query, params[0], params[1], params[2])).rows;
+  if (params.length === 2) results = (await worldBankDB.queryObject(query, params[0], params[1])).rows;
   if (results === undefined) results = (await worldBankDB.queryObject(query, params[0])).rows;
 
   await server.json({ response: results });
@@ -121,7 +135,6 @@ async function getResults(server) {
 async function getHistory(server) {
   const cookies = await server.cookies;
   const username = cookies.username;
-  //return server.json({ username: username }); <-- This line has been used to test the above and username IS being read correctly
   const user = getUserInfo(username);
 
   let query = `SELECT * FROM search_history`;
