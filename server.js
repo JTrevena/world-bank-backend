@@ -28,7 +28,7 @@ const CorsSettings = {
     "https://world-bank-dashboard.netlify.app/sign-up",
     "https://world-bank-dashboard.netlify.app/history",
   ],
-  allowedHeaders: ["Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
+  allowedHeaders: ["Access-Control-Allow-Origin", "Authorization", "Content-Type", "Accept", "Origin", "User-Agent"],
   credentials: true,
 };
 
