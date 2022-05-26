@@ -109,7 +109,7 @@ async function getResults(server) {
   let furtherInterpolations = [`$2`, `$3`, `$4`];
   let results;
 
-  if (!startYear) startYear = 2015; // TODO: clarify this default behaviour. The database is too big to return everything in a useful human-readable way
+  //if (!startYear) startYear = 2015; // TODO: clarify this default behaviour. The database is too big to return everything in a useful human-readable way
 
   if (indicator !== undefined) {
     query += ` AND IndicatorName = ` + furtherInterpolations.shift();
