@@ -181,7 +181,7 @@ async function handleLogout(server) {
 
 async function getUserInfo(server, sessionID) {
   const session = (await client.queryObject("SELECT * FROM sessions WHERE uuid = $1;", sessionID)).rows;
-  return server.json({ session: session });
+  return { session: session[0] };
   const user_id = session[0].user_id;
   const user = (await client.queryObject("SELECT * FROM users WHERE id = $1;", user_id)).rows;
   return { user: user[0] };
