@@ -116,10 +116,10 @@ async function getResults(server) {
     params.push(indicator);
   }
 
-  if (!endYear) {
+  if (startYear && !endYear) {
     query += ` AND Year = ` + furtherInterpolations.shift();
     params.push(startYear);
-  } else {
+  } else if (startYear && endYear) {
     query += ` AND Year BETWEEN ` + furtherInterpolations.shift() + ` AND ` + furtherInterpolations.shift();
     params.push(startYear);
     params.push(endYear);
