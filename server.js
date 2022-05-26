@@ -172,7 +172,7 @@ async function handleLogout(server) {
 }
 
 async function getUserInfo(username) {
-  const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", username)).rows;
+  const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", String(username)).rows;
   return user;
 }
 
