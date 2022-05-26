@@ -33,6 +33,7 @@ const CorsSettings = {
 };
 
 app
+  .set("trust proxy", 1)
   .use(abcCors(CorsSettings))
   .post("/create-user", postNewUser)
   .post("/login", handleLogin)
