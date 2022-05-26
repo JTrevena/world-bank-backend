@@ -89,14 +89,20 @@ async function handleLogin(server) {
     user.id
   );
 
-  server.setCookie({
-    name: "sessionID",
-    value: sessionUUID,
-  });
-  server.setCookie({
-    name: "username",
-    value: username,
-  });
+  server.setCookie(
+    {},
+    {
+      name: "sessionID",
+      value: sessionUUID,
+    }
+  );
+  server.setCookie(
+    {},
+    {
+      name: "username",
+      value: username,
+    }
+  );
 }
 
 async function getResults(server) {
@@ -108,8 +114,6 @@ async function getResults(server) {
   let params = [country];
   let furtherInterpolations = [`$2`, `$3`, `$4`];
   let results;
-
-  //if (!startYear) startYear = 2015; // TODO: clarify this default behaviour. The database is too big to return everything in a useful human-readable way
 
   if (indicator !== undefined) {
     query += ` AND IndicatorName = ` + furtherInterpolations.shift();
