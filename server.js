@@ -100,7 +100,8 @@ async function handleLogin(server) {
 }
 
 async function getResults(server) {
-  const { country, indicator, startYear, endYear } = server.queryParams;
+  const { country, indicator, endYear } = server.queryParams;
+  let { startYear } = server.queryParams;
   if (country === undefined) return server.json({ error: "country must be specified" });
 
   let query = `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`;
@@ -108,15 +109,17 @@ async function getResults(server) {
   let furtherInterpolations = [`$2`, `$3`, `$4`];
   let results;
 
+  if (!startYear) startYear = 2022;
+
   if (indicator !== undefined) {
     query += ` AND IndicatorName = ` + furtherInterpolations.shift();
     params.push(indicator);
   }
 
-  if (startYear !== undefined && endYear === undefined) {
+  if (!endYear) {
     query += ` AND Year = ` + furtherInterpolations.shift();
     params.push(startYear);
-  } else if (startYear !== undefined && endYear !== undefined) {
+  } else {
     query += ` AND Year BETWEEN ` + furtherInterpolations.shift() + ` AND ` + furtherInterpolations.shift();
     params.push(startYear);
     params.push(endYear);
