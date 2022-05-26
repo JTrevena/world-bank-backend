@@ -106,9 +106,23 @@ async function handleLogin(server) {
 }
 
 async function getResults(server) {
-  const { country, indicator, endYear } = server.queryParams;
-  let { startYear } = server.queryParams;
+  const { country, indicator, startYear, endYear } = server.queryParams;
   if (country === undefined) return server.json({ error: "country must be specified" });
+
+  const cookies = await server.cookies;
+  const username = cookies.username;
+  const user = await getUserInfo(username);
+
+  //record search
+  await client.queryObject(
+    `INSERT INTO search_history (user_id,	first_country,	indicator,	start_year,	end_year,	created_at)
+    VALUES ($1, $2, $3, $4, $5, NOW())`,
+    user.user.id,
+    country,
+    indicator,
+    startYear,
+    endYear
+  );
 
   let query = `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`;
   let params = [country];
@@ -141,8 +155,8 @@ async function getResults(server) {
 
 async function getHistory(server) {
   const cookies = await server.cookies;
-  const username = cookies.username; //username is read properly
-  const user = await getUserInfo(server, username); // but user is not found correctly
+  const username = cookies.username;
+  const user = await getUserInfo(username);
 
   let query = `SELECT * FROM search_history`;
   let searches;
@@ -175,7 +189,7 @@ async function handleLogout(server) {
     } // spent about an hour and couldn't delete/overwrite cookies so I propose to delete in frontend (if we get response from backend)
 }
 
-async function getUserInfo(server, username) {
+async function getUserInfo(username) {
   const userNameStr = String(username);
   const user = (await client.queryObject("SELECT * FROM users WHERE username = $1;", userNameStr)).rows;
   return { user: user[0] };
