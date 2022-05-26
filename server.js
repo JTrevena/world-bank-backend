@@ -109,7 +109,7 @@ async function getResults(server) {
   let furtherInterpolations = [`$2`, `$3`, `$4`];
   let results;
 
-  if (!startYear) startYear = 2015;
+  if (!startYear) startYear = 2015; // TODO: clarify this default behaviour. The database is too big to return everything in a useful human-readable way
 
   if (indicator !== undefined) {
     query += ` AND IndicatorName = ` + furtherInterpolations.shift();
@@ -132,7 +132,7 @@ async function getResults(server) {
   if (params.length === 2) results = (await worldBankDB.queryObject(query, params[0], params[1])).rows;
   if (results === undefined) results = (await worldBankDB.queryObject(query, params[0])).rows;
 
-  await server.json({ response: results });
+  await server.json(results);
 }
 
 async function getHistory(server) {
