@@ -100,8 +100,7 @@ async function handleLogin(server) {
 }
 
 async function getResults(server) {
-  const { country, indicator, endYear } = server.queryParams;
-  let { startYear } = server.queryParams;
+  let { country, indicator, startYear, endYear } = server.queryParams;
   if (country === undefined) return server.json({ error: "country must be specified" });
 
   let query = `SELECT CountryName, IndicatorName, Year, Value FROM indicators WHERE CountryName = $1`;
