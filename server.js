@@ -5,11 +5,16 @@ import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 
+const WORLD_BANK_PATH = "postgres://czreijar:TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t@kandula.db.elephantsql.com/czreijar";
+
 const DENO_ENV = Deno.env.get("DENO_ENV") ?? "development";
 config({ path: `./.env.${DENO_ENV}`, export: true });
 
 const client = new Client(Deno.env.get("PG_URL"));
 await client.connect();
+
+const worldBankDB = new Client(WORLD_BANK_PATH);
+await worldBankDB.connect();
 
 const app = new Application();
 const PORT = Number(Deno.env.get("PORT"));
@@ -95,9 +100,10 @@ async function handleLogin(server) {
 }
 
 async function getResults(server) {
-  //server test
-  const cookie = await server.cookies;
-  return server.json({ response: "The server is running", cookieResponse: cookie }, 200);
+  const { country, indicator, startYear, endYear } = server.queryParams;
+  if (country == undefined) return server.json({ error: "country must be specified" });
+  const results = await worldBankDB.queryObject(`SELECT * FROM indicators WHERE CountryName = $1`, country);
+  await server.json({ response: results });
 }
 
 async function getHistory(server) {
