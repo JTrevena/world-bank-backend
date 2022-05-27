@@ -1,8 +1,6 @@
 import { Application } from "https://deno.land/x/abc/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
-import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
-import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import postNewUser from "./serverFunctions/postNewUser";
 import verifySession from "./serverFunctions/verifySession";

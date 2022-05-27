@@ -1,3 +1,6 @@
+import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+import { v4 } from "https://deno.land/std/uuid/mod.ts";
+
 async function handleLogin(server) {
   const { username, password } = await server.body;
   const users = (await client.queryObject(`SELECT * FROM users;`)).rows;

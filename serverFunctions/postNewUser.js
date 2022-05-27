@@ -1,3 +1,5 @@
+import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
+
 async function postNewUser(server) {
   const { username, password } = await server.body;
 
