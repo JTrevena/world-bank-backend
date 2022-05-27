@@ -2,12 +2,12 @@ import { Application } from "https://deno.land/x/abc/mod.ts";
 import { abcCors } from "https://deno.land/x/cors/mod.ts";
 import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
-import postNewUser from "./serverFunctions/postNewUser";
-import verifySession from "./serverFunctions/verifySession";
-import handleLogin from "./serverFunctions/handleLogin";
-import getResults from "./serverFunctions/getResults";
-import getHistory from "./serverFunctions/getHistory";
-import handleLogout from "./serverFunctions/handleLogout";
+import postNewUser from "./server-functions/postNewUser";
+import verifySession from "./server-functions/verifySession";
+import handleLogin from "./server-functions/handleLogin";
+import getResults from "./server-functions/getResults";
+import getHistory from "./server-functions/getHistory";
+import handleLogout from "./server-functions/handleLogout";
 
 const WORLD_BANK_PATH = "postgres://czreijar:TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t@kandula.db.elephantsql.com/czreijar";
 
