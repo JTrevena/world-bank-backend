@@ -134,9 +134,9 @@ async function getHistory(server) {
   let query = `SELECT * FROM search_history`;
   let searches;
   if (!user.admin_permission) {
-    query += ` WHERE user_id = $1;`;
+    query += ` WHERE user_id = $1 ORDER BY created_at DESC;`;
     searches = (await client.queryObject(query, user.user.id)).rows;
-  } else searches = (await client.queryObject(query)).rows;
+  } else searches = (await client.queryObject(query + `ORDER BY created_at DESC`)).rows;
   if (searches) server.json({ response: searches });
   else server.json({ response: "no searches found" });
 }
