@@ -4,12 +4,12 @@ import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt/mod.ts";
 import { v4 } from "https://deno.land/std/uuid/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
-import postNewUser from "./postNewUser";
-import verifySession from "./verifySession";
-import handleLogin from "./handleLogin";
-import getResults from "./getResults";
-import getHistory from "./getHistory";
-import handleLogout from "./handleLogout";
+import postNewUser from "./serverFunctions/postNewUser";
+import verifySession from "./serverFunctions/verifySession";
+import handleLogin from "./serverFunctions/handleLogin";
+import getResults from "./serverFunctions/getResults";
+import getHistory from "./serverFunctions/getHistory";
+import handleLogout from "./serverFunctions/handleLogout";
 
 const WORLD_BANK_PATH = "postgres://czreijar:TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t@kandula.db.elephantsql.com/czreijar";
 
