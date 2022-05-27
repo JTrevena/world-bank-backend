@@ -4,6 +4,7 @@ import { Client } from "https://deno.land/x/postgres@v0.11.3/mod.ts";
 import { config } from "https://deno.land/x/dotenv/mod.ts";
 import postNewUser from "./postNewUser";
 import verifySession from "./verifySession";
+import getUserInfo from "./getUserInfo";
 import handleLogin from "./handleLogin";
 import getResults from "./getResults";
 import getHistory from "./getHistory";
@@ -45,5 +46,21 @@ app
   .delete("/logout", handleLogout)
   .post("/verify-session", verifySession)
   .start({ port: PORT });
+
+async function getHistory(server) {
+  const { sessionID } = server.queryParams;
+  const user = await getUserInfo(server, sessionID);
+
+  let query = `SELECT * FROM search_history`;
+  let searches;
+
+  if (!user.admin_permission) {
+    query += ` WHERE user_id = $1;`;
+    searches = (await client.queryObject(query, user.user.id)).rows;
+  } else searches = (await client.queryObject(query)).rows;
+
+  if (searches) server.json({ response: searches });
+  else server.json({ response: "no searches found" });
+}
 
 console.log(`Server running on http://localhost:${PORT}`);
