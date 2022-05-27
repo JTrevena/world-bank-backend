@@ -5,8 +5,8 @@ import { config } from "https://deno.land/x/dotenv/mod.ts";
 import postNewUser from "./postNewUser";
 import verifySession from "./verifySession";
 import handleLogin from "./handleLogin";
-import getResults from "./server-functions/getResults";
-import getHistory from "./server-functions/getHistory";
+import getResults from "./getResults";
+import getHistory from "./getHistory";
 import handleLogout from "./handleLogout";
 
 const WORLD_BANK_PATH = "postgres://czreijar:TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t@kandula.db.elephantsql.com/czreijar";
